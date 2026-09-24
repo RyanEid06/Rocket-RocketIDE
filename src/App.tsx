@@ -17,10 +17,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#000000] text-neutral-100 flex flex-col selection:bg-orange-500/25 selection:text-orange-200">
+    <div className="min-h-screen bg-[#000000] text-neutral-100 flex flex-col selection:bg-orange-500/25 selection:text-orange-200 overflow-x-hidden w-full max-w-full">
       
       {/* Background ambient lighting */}
-      <div className="fixed inset-0 bg-ambient-radial pointer-events-none -z-10" />
+      <div className="fixed inset-0 bg-ambient-radial pointer-events-none -z-10 overflow-hidden" />
 
       {/* 4-Page Navigation Top Bar */}
       <Navbar
@@ -29,7 +29,7 @@ export default function App() {
       />
 
       {/* Main Single Page Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 overflow-x-hidden">
         {currentPage === 'intro' && (
           <PageIntro onNavigate={handleNavigate} />
         )}

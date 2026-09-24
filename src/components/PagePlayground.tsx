@@ -6,6 +6,7 @@ import {
   ArrowLeft, Monitor, Folder, FileCode, CheckCircle2, Bug
 } from 'lucide-react';
 import { AppPage } from '../App';
+import logoImg from '../assets/images/rocket_ide_logo.png';
 
 interface PagePlaygroundProps {
   onNavigate: (page: AppPage) => void;
@@ -125,7 +126,7 @@ export const PagePlayground: React.FC<PagePlaygroundProps> = ({ onNavigate }) =>
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
             <div className="flex items-center gap-2">
-              <img src="/rocket_ide_logo.png" alt="RocketIDE Icon" className="w-4 h-4 object-contain" />
+              <img src={logoImg} alt="RocketIDE Icon" className="w-4 h-4 object-contain" />
               <span className="font-mono-code text-[11px] text-neutral-300">
                 {selectedExample.filename} — RocketIDE
               </span>

@@ -10,6 +10,7 @@ import { BenchmarkComparison } from './BenchmarkComparison';
 // Import image assets directly so Vite bundles them with correct relative hashes on GitHub Pages
 import codeTypesImg from '../assets/images/rocket_code_types_1790262748282.jpg';
 import codeSystemsImg from '../assets/images/rocket_code_systems_1790262761562.jpg';
+import logoImg from '../assets/images/rocket_ide_logo.png';
 
 interface PageIntroProps {
   onNavigate: (page: AppPage) => void;
@@ -81,9 +82,12 @@ export const PageIntro: React.FC<PageIntroProps> = ({ onNavigate }) => {
                 <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
                 <div className="w-3 h-3 rounded-full bg-green-500/80" />
               </div>
-              <span className="font-mono-code text-[11px] text-neutral-300">
-                fibonacci.rocket — RocketIDE
-              </span>
+              <div className="flex items-center gap-2">
+                <img src={logoImg} alt="RocketIDE Icon" className="w-4 h-4 object-contain" />
+                <span className="font-mono-code text-[11px] text-neutral-300">
+                  fibonacci.rocket — RocketIDE
+                </span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 text-[11px] text-neutral-400 font-mono-code">

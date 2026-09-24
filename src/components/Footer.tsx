@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AppPage } from '../App';
 import { ShieldCheck, FileText, X } from 'lucide-react';
+import logoImg from '../assets/images/rocket_ide_logo.png';
 
 interface FooterProps {
   onNavigate: (page: AppPage) => void;
@@ -21,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             className="flex items-center gap-3 text-left group"
           >
             <img
-              src="/rocket_ide_logo.png"
+              src={logoImg}
               alt="RocketIDE Official Logo"
               className="w-6 h-6 object-contain"
             />
