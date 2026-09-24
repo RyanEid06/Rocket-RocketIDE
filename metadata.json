@@ -1,0 +1,7 @@
+{
+  "name": "Rocket & RocketIDE — Official Language & Development Environment",
+  "description": "The official home of the Rocket programming language and RocketIDE. High-performance, memory-safe, expressive syntax with a dedicated developer studio. Download binaries, try the interactive playground, and explore the ecosystem.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
