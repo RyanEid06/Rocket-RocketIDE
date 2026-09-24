@@ -1,4 +1,5 @@
 import React from 'react';
+import logoImg from '../assets/images/rocket_ide_logo.png';
 
 export const RealIdeScreenshot: React.FC = () => {
   return (
@@ -7,7 +8,7 @@ export const RealIdeScreenshot: React.FC = () => {
       {/* 1. Real Window Title Bar */}
       <div className="bg-[#18181b] px-3 py-1.5 flex items-center justify-between border-b border-neutral-800 text-neutral-300">
         <div className="flex items-center gap-2">
-          <img src="/rocket_ide_logo.png" alt="RocketIDE Icon" className="w-4 h-4 object-contain" />
+          <img src={logoImg} alt="RocketIDE Icon" className="w-4 h-4 object-contain" />
           <span className="font-mono-code text-[11px] text-neutral-200">test.rocket — RocketIDE</span>
         </div>
         <div className="flex items-center gap-3 text-neutral-400 text-xs">

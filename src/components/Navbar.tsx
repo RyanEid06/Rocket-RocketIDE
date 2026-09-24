@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Download, Menu, X, Play, Monitor, Terminal } from 'lucide-react';
 import { AppPage } from '../App';
+import logoImg from '../assets/images/rocket_ide_logo.png';
 
 interface NavbarProps {
   currentPage: AppPage;
@@ -33,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           className="flex items-center gap-3 text-left group"
         >
           <img
-            src="/rocket_ide_logo.png"
+            src={logoImg}
             alt="RocketIDE Official Logo"
             className="w-7 h-7 object-contain drop-shadow-md group-hover:scale-105 transition-transform"
           />

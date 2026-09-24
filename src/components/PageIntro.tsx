@@ -7,6 +7,10 @@ import { AppPage } from '../App';
 import { RealIdeScreenshot } from './RealIdeScreenshot';
 import { BenchmarkComparison } from './BenchmarkComparison';
 
+// Import image assets directly so Vite bundles them with correct relative hashes on GitHub Pages
+import codeTypesImg from '../assets/images/rocket_code_types_1790262748282.jpg';
+import codeSystemsImg from '../assets/images/rocket_code_systems_1790262761562.jpg';
+
 interface PageIntroProps {
   onNavigate: (page: AppPage) => void;
 }
@@ -345,9 +349,8 @@ export const PageIntro: React.FC<PageIntroProps> = ({ onNavigate }) => {
 
         <div className="lg:col-span-7 rounded-xl border border-neutral-800 bg-[#000000] overflow-hidden shadow-2xl">
           <img
-            src="/src/assets/images/rocket_code_types_1790262748282.jpg"
+            src={codeTypesImg}
             alt="Rocket Type System Code"
-            referrerPolicy="no-referrer"
             className="w-full h-auto object-cover"
           />
         </div>
@@ -359,9 +362,8 @@ export const PageIntro: React.FC<PageIntroProps> = ({ onNavigate }) => {
         
         <div className="lg:col-span-7 rounded-xl border border-neutral-800 bg-[#000000] overflow-hidden shadow-2xl order-2 lg:order-1">
           <img
-            src="/src/assets/images/rocket_code_systems_1790262761562.jpg"
+            src={codeSystemsImg}
             alt="Rocket Concurrency & Systems Code"
-            referrerPolicy="no-referrer"
             className="w-full h-auto object-cover"
           />
         </div>
