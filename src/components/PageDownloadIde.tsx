@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { RELEASE_ASSETS } from '../data/rocketData';
+import { RELEASE_ASSETS, getDownloadUrl, GITHUB_RELEASES_URL } from '../data/rocketData';
 import { 
   Download, Copy, Check, ShieldCheck, Monitor, 
-  ArrowLeft, ArrowRight, Terminal, Laptop
+  ArrowLeft, ArrowRight, Terminal, Laptop, ExternalLink
 } from 'lucide-react';
 import { AppPage } from '../App';
 
@@ -30,21 +30,19 @@ export const PageDownloadIde: React.FC<PageDownloadIdeProps> = ({ onNavigate }) 
 
   const handleInitiateDownload = (asset: typeof ideAssets[0]) => {
     setDownloadingId(asset.id);
-    
-    // Simulate real binary delivery triggering browser download action
+    const directUrl = getDownloadUrl(asset.filename);
+
+    // Direct browser navigation to start the genuine binary download from GitHub Releases
+    const a = document.createElement('a');
+    a.href = directUrl;
+    a.setAttribute('download', asset.filename);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
     setTimeout(() => {
-      const dummyData = `# RocketIDE Distribution Binary: ${asset.filename}\n# Platform: ${asset.platform}\n# Architecture: ${asset.architecture}\n# Checksum (SHA-256): ${asset.sha256}\n\n[RocketIDE binary package download payload]`;
-      const blob = new Blob([dummyData], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = asset.filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
       setDownloadingId(null);
-    }, 700);
+    }, 1500);
   };
 
   return (
@@ -173,10 +171,11 @@ export const PageDownloadIde: React.FC<PageDownloadIdeProps> = ({ onNavigate }) 
               </div>
 
               {/* Download CTA */}
-              <div className="mt-6 pt-4 border-t border-neutral-800">
-                <button
+              <div className="mt-6 pt-4 border-t border-neutral-800 space-y-2">
+                <a
+                  href={getDownloadUrl(asset.filename)}
+                  download={asset.filename}
                   onClick={() => handleInitiateDownload(asset)}
-                  disabled={isDownloading}
                   className={`w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-semibold rounded-lg transition-all ${
                     asset.recommended
                       ? 'bg-white hover:bg-neutral-200 text-neutral-950 shadow-md'
@@ -194,7 +193,20 @@ export const PageDownloadIde: React.FC<PageDownloadIdeProps> = ({ onNavigate }) 
                       <span>Download {asset.filename}</span>
                     </>
                   )}
-                </button>
+                </a>
+
+                <div className="flex items-center justify-between text-[11px] text-neutral-500 px-1">
+                  <span>Fast direct CDN from GitHub</span>
+                  <a
+                    href={GITHUB_RELEASES_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-neutral-400 hover:text-orange-400 flex items-center gap-1 transition-colors"
+                  >
+                    <span>View Releases</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
           );

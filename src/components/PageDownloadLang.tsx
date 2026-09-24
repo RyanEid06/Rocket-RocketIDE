@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { RELEASE_ASSETS } from '../data/rocketData';
+import { RELEASE_ASSETS, getDownloadUrl, GITHUB_RELEASES_URL } from '../data/rocketData';
 import { 
   Download, Copy, Check, Terminal, 
-  ArrowLeft, ArrowRight, ShieldCheck, Box, Monitor
+  ArrowLeft, ArrowRight, ShieldCheck, Box, Monitor, ExternalLink
 } from 'lucide-react';
 import { AppPage } from '../App';
 
@@ -37,19 +37,18 @@ export const PageDownloadLang: React.FC<PageDownloadLangProps> = ({ onNavigate }
 
   const handleInitiateDownload = (asset: typeof toolchainAssets[0]) => {
     setDownloadingId(asset.id);
+    const directUrl = getDownloadUrl(asset.filename);
+
+    const a = document.createElement('a');
+    a.href = directUrl;
+    a.setAttribute('download', asset.filename);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
     setTimeout(() => {
-      const dummyData = `# Rocket Language SDK Package: ${asset.filename}\n# Architecture: ${asset.architecture}\n# Checksum: ${asset.sha256}\n\n[Rocket compiler and toolchain payload]`;
-      const blob = new Blob([dummyData], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = asset.filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
       setDownloadingId(null);
-    }, 700);
+    }, 1500);
   };
 
   return (
@@ -176,10 +175,11 @@ export const PageDownloadLang: React.FC<PageDownloadLangProps> = ({ onNavigate }
               </div>
 
               {/* Download CTA */}
-              <div className="mt-6 pt-4 border-t border-neutral-800">
-                <button
+              <div className="mt-6 pt-4 border-t border-neutral-800 space-y-2">
+                <a
+                  href={getDownloadUrl(asset.filename)}
+                  download={asset.filename}
                   onClick={() => handleInitiateDownload(asset)}
-                  disabled={isDownloading}
                   className={`w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-semibold rounded-lg transition-all ${
                     asset.recommended
                       ? 'bg-white hover:bg-neutral-200 text-neutral-950 shadow-md'
@@ -197,7 +197,20 @@ export const PageDownloadLang: React.FC<PageDownloadLangProps> = ({ onNavigate }
                       <span>Download {asset.filename}</span>
                     </>
                   )}
-                </button>
+                </a>
+
+                <div className="flex items-center justify-between text-[11px] text-neutral-500 px-1">
+                  <span>Fast direct CDN from GitHub</span>
+                  <a
+                    href={GITHUB_RELEASES_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-neutral-400 hover:text-orange-400 flex items-center gap-1 transition-colors"
+                  >
+                    <span>View Releases</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
           );

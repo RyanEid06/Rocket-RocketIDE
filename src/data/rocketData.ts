@@ -164,6 +164,15 @@ Async task completed with: 42
   }
 ];
 
+export const GITHUB_REPO = 'RyanEid06/Rocket-RocketIDE';
+export const CURRENT_RELEASE_TAG = 'v3.0.0';
+export const GITHUB_RELEASES_URL = `https://github.com/${GITHUB_REPO}/releases`;
+export const GITHUB_LATEST_RELEASE_URL = `https://github.com/${GITHUB_REPO}/releases/tag/${CURRENT_RELEASE_TAG}`;
+
+export const getDownloadUrl = (filename: string): string => {
+  return `https://github.com/${GITHUB_REPO}/releases/download/${CURRENT_RELEASE_TAG}/${filename}`;
+};
+
 export const RELEASE_ASSETS: ReleaseAsset[] = [
   // Windows
   {
