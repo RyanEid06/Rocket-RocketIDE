@@ -1,0 +1,102 @@
+name: Clean and verify Windows downloads
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-downloads:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Download the published Windows packages
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force original | Out-Null
+          gh release download v3.0.0 -R RyanEid06/Rocket-RocketIDE `
+            -p 'rocket-3.0.0-windows-x64.zip' `
+            -p 'RocketIDE-Setup-1.0.0.exe' `
+            -p 'RocketIDE-win-x64-1.0.0.zip' -D original
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify frozen IDE assets and build cleaned SDK
+        shell: pwsh
+        run: |
+          $manifest = Get-Content public/downloads.json -Raw | ConvertFrom-Json
+          foreach ($name in 'RocketIDE-Setup-1.0.0.exe','RocketIDE-win-x64-1.0.0.zip') {
+            $entry = $manifest | Where-Object filename -EQ $name
+            $file = Get-Item -LiteralPath (Join-Path original $name)
+            $digest = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($file.Length -ne $entry.size -or $digest -ne $entry.sha256) { throw "Published IDE asset mismatch: $name" }
+            Write-Host "$name $($file.Length) $digest"
+          }
+          python scripts/clean_windows_sdk.py --input original/rocket-3.0.0-windows-x64.zip `
+            --manifest public/downloads.json --output-dir dist-sdk
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Extract and smoke test the packaged Windows SDK
+        shell: pwsh
+        run: |
+          $work = Join-Path $env:RUNNER_TEMP 'Rocket SDK smoke with spaces'
+          New-Item -ItemType Directory -Force $work | Out-Null
+          Expand-Archive -LiteralPath dist-sdk/Rocket-SDK-3.0.0-windows-x64.zip -DestinationPath $work
+          $sdk = Join-Path $work 'Rocket-SDK-3.0.0-windows-x64'
+          $env:SDK = $sdk
+          python -c "import hashlib,os,pathlib; r=pathlib.Path(os.environ['SDK']); entries=[line.split('  ',1) for line in (r/'SHA256SUMS.txt').read_text().splitlines()]; assert all(hashlib.sha256((r/p).read_bytes()).hexdigest()==d for d,p in entries); actual={p.relative_to(r).as_posix() for p in r.rglob('*') if p.is_file()}; assert actual-{'SHA256SUMS.txt'}=={p for d,p in entries}; assert not {'docs','editors','stage0','tools'} & {p.name for p in r.iterdir()}; print('Verified',len(actual),'package files')"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $hello = Join-Path $work 'hello.rocket'
+          [IO.File]::WriteAllText($hello, "fn main() -> Int:`n    print(`"rocket-sdk-smoke-ok`")`n    return 0`n")
+          & (Join-Path $sdk 'bin/rocketc.exe') --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $sdk 'bin/rocket-lsp.exe') --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $sdk 'bin/rocketc.exe') target --verbose
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $sdk 'bin/rocketc.exe') check $hello
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $sdk 'bin/rocketc.exe') run $hello
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify portable IDE and silent installer in disposable paths
+        shell: pwsh
+        run: |
+          $portable = Join-Path $env:RUNNER_TEMP 'RocketIDE portable smoke'
+          Expand-Archive -LiteralPath original/RocketIDE-win-x64-1.0.0.zip -DestinationPath $portable
+          $app = Join-Path $portable 'RocketIDE-win-x64-1.0.0'
+          foreach ($relative in 'RocketIDE.exe','RocketIDE.Debugger.dll','amd64/EngHost.exe','RocketIDE.runtimeconfig.json') {
+            if (-not (Test-Path -LiteralPath (Join-Path $app $relative) -PathType Leaf)) { throw "Missing portable IDE file: $relative" }
+          }
+          $installed = Join-Path $env:RUNNER_TEMP 'RocketIDE installer smoke'
+          $process = Start-Process -FilePath (Resolve-Path original/RocketIDE-Setup-1.0.0.exe) `
+            -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',"/DIR=`"$installed`"") `
+            -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Installer exited $($process.ExitCode)" }
+          foreach ($relative in 'RocketIDE.exe','RocketIDE.Debugger.dll','amd64/EngHost.exe','unins000.exe') {
+            if (-not (Test-Path -LiteralPath (Join-Path $installed $relative) -PathType Leaf)) { throw "Missing installed IDE file: $relative" }
+          }
+          $uninstall = Start-Process -FilePath (Join-Path $installed 'unins000.exe') `
+            -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstaller exited $($uninstall.ExitCode)" }
+      - name: Publish cleaned Windows SDK and download it back
+        shell: pwsh
+        run: |
+          gh release upload v3.0.0 -R RyanEid06/Rocket-RocketIDE `
+            dist-sdk/Rocket-SDK-3.0.0-windows-x64.zip --clobber
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force published | Out-Null
+          gh release download v3.0.0 -R RyanEid06/Rocket-RocketIDE `
+            -p 'Rocket-SDK-3.0.0-windows-x64.zip' -D published
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import hashlib,json,pathlib; r=json.load(open('dist-sdk/report-windows-x64.json')); p=pathlib.Path('published')/r['archive']; assert p.stat().st_size==r['archive_size']; assert hashlib.sha256(p.read_bytes()).hexdigest()==r['archive_sha256']; print(r['archive'],r['archive_size'],r['archive_sha256'])"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: published-windows-sdk-report
+          path: dist-sdk/report-windows-x64.json
+          if-no-files-found: error
+          retention-days: 30
