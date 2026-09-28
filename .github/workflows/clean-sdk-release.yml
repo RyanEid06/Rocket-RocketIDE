@@ -1,0 +1,135 @@
+name: Clean and verify Rocket SDK downloads
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            runner: ubuntu-24.04
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: macos-arm64
+            runner: macos-14
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify native host
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$TARGET:$(uname -s):$(uname -m)" in
+            linux-x64:Linux:x86_64|linux-arm64:Linux:aarch64|macos-arm64:Darwin:arm64) ;;
+            *) echo "Wrong native host for $TARGET: $(uname -s) $(uname -m)" >&2; exit 1 ;;
+          esac
+      - name: Download and clean published archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p original dist-sdk
+          gh release download v3.0.0 -R RyanEid06/Rocket-RocketIDE \
+            -p "rocket-3.0.0-$TARGET.tar.xz" -D original
+          python scripts/clean_sdk_archive.py \
+            --input "original/rocket-3.0.0-$TARGET.tar.xz" \
+            --target "$TARGET" --manifest public/downloads.json \
+            --output-dir dist-sdk
+      - name: Verify extracted archive and native SDK smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/Rocket SDK smoke with spaces"
+          mkdir -p "$work"
+          tar -xJf "dist-sdk/Rocket-SDK-3.0.0-$TARGET.tar.xz" -C "$work"
+          sdk="$work/Rocket-SDK-3.0.0-$TARGET"
+          SDK="$sdk" python - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          root = Path(os.environ['SDK'])
+          expected = set()
+          for line in (root / 'SHA256SUMS.txt').read_text().splitlines():
+              digest, relative = line.split('  ', 1)
+              path = root / relative
+              assert path.is_file(), relative
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, relative
+              expected.add(relative)
+          actual = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
+          assert actual - {'SHA256SUMS.txt'} == expected
+          assert not ({'stage0', 'tools', 'docs', 'editors'} & {p.name for p in root.iterdir()})
+          print(f'Verified {len(actual)} package files and all SHA-256 checksums')
+          PY
+          printf 'fn main() -> Int:\n    print("rocket-sdk-smoke-ok")\n    return 0\n' > "$work/hello.rocket"
+          "$sdk/bin/rocketc" --version | grep -Fx 'rocketc 3.0.0'
+          "$sdk/bin/rocketc" target --verbose | grep -Fx "target: $TARGET"
+          "$sdk/bin/rocketc" check "$work/hello.rocket"
+          "$sdk/bin/rocketc" run "$work/hello.rocket" | grep -Fx 'rocket-sdk-smoke-ok'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clean-sdk-${{ matrix.target }}
+          path: |
+            dist-sdk/Rocket-SDK-3.0.0-${{ matrix.target }}.tar.xz
+            dist-sdk/report-${{ matrix.target }}.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  publish-and-redownload:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: clean-sdk-*
+          path: candidate
+          merge-multiple: true
+      - name: Upload verified native archives to the existing release
+        shell: bash
+        run: |
+          set -euo pipefail
+          for target in linux-x64 linux-arm64 macos-arm64; do
+            test -s "candidate/Rocket-SDK-3.0.0-$target.tar.xz"
+            test -s "candidate/report-$target.json"
+          done
+          gh release upload v3.0.0 -R RyanEid06/Rocket-RocketIDE \
+            candidate/Rocket-SDK-3.0.0-*.tar.xz --clobber
+      - name: Download published archives and verify hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p published
+          for target in linux-x64 linux-arm64 macos-arm64; do
+            gh release download v3.0.0 -R RyanEid06/Rocket-RocketIDE \
+              -p "Rocket-SDK-3.0.0-$target.tar.xz" -D published
+            TARGET="$target" python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          target = os.environ['TARGET']
+          report = json.loads(Path(f'candidate/report-{target}.json').read_text())
+          asset = Path('published') / report['archive']
+          assert asset.stat().st_size == report['archive_size']
+          assert hashlib.sha256(asset.read_bytes()).hexdigest() == report['archive_sha256']
+          print(target, report['archive_size'], report['archive_sha256'])
+          PY
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: published-sdk-reports
+          path: candidate/report-*.json
+          if-no-files-found: error
+          retention-days: 30
