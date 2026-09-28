@@ -56,7 +56,8 @@ def install_text(target: str) -> str:
         "Run `xcode-select --install` if the tools are missing. Rocket does not\n"
         "redistribute the Apple SDK.\n"
         if target == "macos-arm64" else
-        "Install the host glibc development ABI and system link libraries.\n"
+        "Install the host glibc development ABI and libcurl development package.\n"
+        "On Ubuntu/Debian, run `sudo apt-get install libc6-dev libcurl4-openssl-dev`.\n"
         "The Clang/LLD toolchain and Rocket runtime are included.\n"
     )
     return f"""# Rocket SDK {VERSION} for {target}
