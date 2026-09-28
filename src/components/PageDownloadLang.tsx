@@ -215,8 +215,8 @@ export const PageDownloadLang: React.FC<PageDownloadLangProps> = ({ onNavigate }
 
       <div className="p-5 bg-neutral-950 border border-orange-500/30 rounded-xl space-y-2 text-sm text-neutral-300">
         <h3 className="font-semibold text-white">Minimal cross-platform SDK</h3>
-        <p>The Rocket repository also provides ready-to-use consumer packages for Windows x64, Linux x64, Linux ARM64, and macOS Apple Silicon ARM64 on the <code>consummer</code> branch. Install Git LFS before cloning to retrieve the compiler tools and platform packages.</p>
-        <a href="https://github.com/RyanEid06/Rocket/tree/consummer" target="_blank" rel="noreferrer" className="text-orange-300 hover:underline inline-flex items-center gap-1 text-xs font-semibold">
+        <p>The Rocket repository also provides ready-to-use consumer packages for Windows x64, Linux x64, Linux ARM64, and macOS Apple Silicon ARM64 on the <code>consumer</code> branch. Install Git LFS before cloning to retrieve the compiler tools and platform packages.</p>
+        <a href="https://github.com/RyanEid06/Rocket/tree/consumer" target="_blank" rel="noreferrer" className="text-orange-300 hover:underline inline-flex items-center gap-1 text-xs font-semibold">
           View the minimal SDK branch <ExternalLink className="w-3 h-3" />
         </a>
       </div>
