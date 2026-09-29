@@ -38,7 +38,7 @@ jobs:
             Write-Host "$name $($file.Length) $digest"
           }
           python scripts/clean_windows_sdk.py --input original/rocket-3.0.0-windows-x64.zip `
-            --manifest public/downloads.json --output-dir dist-sdk
+            --manifest scripts/original-sdk-downloads.json --output-dir dist-sdk
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Extract and smoke test the packaged Windows SDK
         shell: pwsh

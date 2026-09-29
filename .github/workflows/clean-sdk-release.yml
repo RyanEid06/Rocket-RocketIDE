@@ -51,7 +51,7 @@ jobs:
             -p "rocket-3.0.0-$TARGET.tar.xz" -D original
           python scripts/clean_sdk_archive.py \
             --input "original/rocket-3.0.0-$TARGET.tar.xz" \
-            --target "$TARGET" --manifest public/downloads.json \
+            --target "$TARGET" --manifest scripts/original-sdk-downloads.json \
             --output-dir dist-sdk
       - name: Verify extracted archive and native SDK smoke
         shell: bash

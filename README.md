@@ -11,6 +11,7 @@ The [published release](https://github.com/RyanEid06/Rocket-RocketIDE/releases/t
 
 Packages are hosted as GitHub Release assets, not inside the website source. The Windows compiler is named rocketc.exe; other platforms use rocketc. Package filenames, sizes, SHA-256 hashes and URLs are recorded in [public/downloads.json](public/downloads.json); page display data is in [src/data/rocketData.ts](src/data/rocketData.ts). RocketIDE does not bundle the Rocket SDK; configure it separately through Tools > Rocket SDK Settings.
 The older lowercase `rocket-3.0.0-*` archives remain attached to preserve historical download receipts. The current download cards use the cleaned `Rocket-SDK-3.0.0-*` packages.
+The package maintenance workflows verify their original inputs against [scripts/original-sdk-downloads.json](scripts/original-sdk-downloads.json); the live download manifest records the cleaned outputs.
 
 All four cleaned SDK entries record Rocket master source commit `1f6ba76f16f3246095d5d573c28d825d8b9367e3`. Package filenames, sizes, and SHA-256 digests are checked against the published release. The website links to the [cross-platform consumer SDK branch](https://github.com/RyanEid06/Rocket/tree/consumer), which requires Git LFS when cloning. Linux builds need the host glibc and libcurl development packages; on Ubuntu or Debian, install `libc6-dev libcurl4-openssl-dev`. macOS builds need Xcode Command Line Tools and an active macOS SDK. See each package's `INSTALL.md` and the [named Rocket SDK roadmap](ROADMAP.md).
 
