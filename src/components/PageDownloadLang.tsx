@@ -224,7 +224,7 @@ export const PageDownloadLang: React.FC<PageDownloadLangProps> = ({ onNavigate }
       <div className="p-4 bg-neutral-950 border border-neutral-800 rounded-xl space-y-2 text-sm text-neutral-300">
         <p>Extract the complete SDK and add its <code>bin</code> directory to PATH. Windows uses <code>rocketc.exe</code>; Linux and macOS use <code>rocketc</code>. Each archive includes the matching language server, libraries and package instructions.</p>
         <p>Linux packages target x64 or ARM64 and were validated on Ubuntu 24.04. The macOS package is for Apple Silicon (ARM64), validated on macOS 14; an Intel macOS package is not available.</p>
-        <p>On macOS, install Xcode Command Line Tools with <code>xcode-select --install</code> and follow the SDK's PACKAGE.md. On Linux, follow PACKAGE.md for native system prerequisites.</p>
+        <p>On macOS, install Xcode Command Line Tools with <code>xcode-select --install</code> and follow the SDK's INSTALL.md. On Ubuntu or Debian, install <code>libc6-dev libcurl4-openssl-dev</code> before compiling, then follow INSTALL.md.</p>
       </div>
 
       {/* CLI Quickstart Commands */}
