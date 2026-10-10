@@ -18,6 +18,17 @@ All four cleaned SDK entries record Rocket master source commit `1f6ba76f16f3246
 
 The separate [RocketIDE repository](https://github.com/RyanEid06/RocketIDE) uses master for development and consumer for its minimal distribution. Frozen RocketIDE executable downloads and checksums are unchanged by SDK cleanup.
 
+## First-time Windows setup
+
+1. Download and install RocketIDE, or extract its complete Portable ZIP and open `RocketIDE.exe`.
+2. Download the **Windows x64 Rocket SDK** and extract its entire ZIP into a permanent folder, such as `Documents\Rocket\`. Keep every SDK directory, including `stage0`, together.
+3. In RocketIDE, open **Tools > Rocket SDK Settings...**.
+4. Use **Browse...** beside **Rocket compiler** to select the extracted SDK's `bin\rocketc.exe`, then use **Browse...** beside **Language server** to select its `bin\rocket-lsp.exe`.
+5. Click **Save**, then choose **Tools > Validate Rocket Environment**. Open **View > Output** and look for `Environment validation passed.` and compiler version `rocketc 3.0.0`.
+6. Open a writable project folder using **File > Open Folder...**, open or save a `.rocket` file, and try **Build > Check Rocket Target** and **Run > Run Rocket Target**.
+
+Settings survive reinstallation. If the SDK folder changes, select its new paths again. The [getting-started guide](docs/GETTING_STARTED.md) includes a first program, debugging steps, and help with setup problems.
+
 ## Publishing and local preview
 
 Use Node.js 24 and npm:

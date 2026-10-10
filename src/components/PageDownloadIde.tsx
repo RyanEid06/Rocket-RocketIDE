@@ -157,7 +157,14 @@ export const PageDownloadIde: React.FC<PageDownloadIdeProps> = ({ onNavigate }) 
 
       <div className="p-4 bg-neutral-950 border border-neutral-800 rounded-xl space-y-3 text-sm text-neutral-300">
         <p>Run the Windows installer for a guided per-user setup, or choose the Portable ZIP to extract and open <code>RocketIDE.exe</code>. Keep every file in the portable folder together.</p>
-        <p>The Rocket SDK is separate. Extract its complete archive, including <code>stage0</code>, then select <code>bin/rocketc.exe</code> and <code>bin/rocket-lsp.exe</code> in Tools &gt; Rocket SDK Settings.</p>
+        <p>After opening RocketIDE:</p>
+        <ol className="list-decimal pl-5 space-y-2">
+          <li>Download the Windows x64 Rocket SDK and extract its complete ZIP into a folder you will keep. Keep every directory, including <code>stage0</code>, together.</li>
+          <li>Open <strong>Tools &gt; Rocket SDK Settings...</strong>.</li>
+          <li>Use <strong>Browse...</strong> beside <strong>Rocket compiler</strong> to select the SDK's <code>bin/rocketc.exe</code>, and beside <strong>Language server</strong> to select its <code>bin/rocket-lsp.exe</code>.</li>
+          <li>Click <strong>Save</strong>, then choose <strong>Tools &gt; Validate Rocket Environment</strong>. Open <strong>View &gt; Output</strong> and look for <code>Environment validation passed.</code></li>
+        </ol>
+        <p><a href="https://github.com/RyanEid06/Rocket-RocketIDE/blob/main/docs/GETTING_STARTED.md" target="_blank" rel="noreferrer" className="text-orange-300 hover:underline">Read the setup guide and run your first program.</a></p>
         <p>Reinstalling the app preserves your settings under <code>%LOCALAPPDATA%\RocketIDE</code>. If you move or replace the SDK, select its new tool paths again.</p>
         <p>RocketIDE uses Windows WPF. Linux and macOS users can download the Rocket language SDK below and use their preferred editor.</p>
       </div>
