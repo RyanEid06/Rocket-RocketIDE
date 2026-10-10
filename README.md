@@ -36,4 +36,6 @@ This is a static browser application. It needs no API keys, Gemini service, Expr
 
 ## Maintenance record
 
+The [2026-10-10 SDK runtime repair](docs/sdk-runtime-repair-2026-10-10.md) restores the matching stage-zero hosts in all four user SDKs and records fresh native download/debug verification. Original tested compiler and IDE binaries were reused.
+
 Completed release-upload and one-time download-verification workflows, unused AI Studio metadata, unused images and unused server/AI dependencies were removed from the current tree. Their original versions and successful runs remain in Git history and GitHub Actions. The published files were previously verified by [public download verification](https://github.com/RyanEid06/Rocket-RocketIDE/actions/runs/36341667905). Keep the retained source, build configuration, lockfile, active assets and download manifest: they are needed to reproduce the published site.
