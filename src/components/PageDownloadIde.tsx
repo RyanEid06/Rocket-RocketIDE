@@ -157,7 +157,8 @@ export const PageDownloadIde: React.FC<PageDownloadIdeProps> = ({ onNavigate }) 
 
       <div className="p-4 bg-neutral-950 border border-neutral-800 rounded-xl space-y-3 text-sm text-neutral-300">
         <p>Run the Windows installer for a guided per-user setup, or choose the Portable ZIP to extract and open <code>RocketIDE.exe</code>. Keep every file in the portable folder together.</p>
-        <p>The Rocket SDK is separate. Install it yourself, then configure it in Tools &gt; Rocket SDK Settings.</p>
+        <p>The Rocket SDK is separate. Extract its complete archive, including <code>stage0</code>, then select <code>bin/rocketc.exe</code> and <code>bin/rocket-lsp.exe</code> in Tools &gt; Rocket SDK Settings.</p>
+        <p>Reinstalling the app preserves your settings under <code>%LOCALAPPDATA%\RocketIDE</code>. If you move or replace the SDK, select its new tool paths again.</p>
         <p>RocketIDE uses Windows WPF. Linux and macOS users can download the Rocket language SDK below and use their preferred editor.</p>
       </div>
 

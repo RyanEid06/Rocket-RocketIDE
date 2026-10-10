@@ -1,0 +1,95 @@
+name: Publish verified SDK runtime repair
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run:
+        description: Successful original-input native verification run
+        required: true
+        default: '38039048393'
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CANDIDATE_RUN: ${{ inputs.candidate_run }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require successful native candidate verification
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE_RUN" > run.json
+          python - <<'PY'
+          import json
+          r = json.load(open('run.json'))
+          assert r['status'] == 'completed' and r['conclusion'] == 'success'
+          assert r['path'] == '.github/workflows/verify-sdk-distributions.yml'
+          assert r['head_sha'] == 'f5b0344831f381608fc091489b360b454227571b'
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.candidate_run }}
+          pattern: sdk-original-*
+          path: candidates
+      - name: Verify candidate archive identities and create repair receipt
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          original = {e['target']:e for e in json.loads(Path('scripts/original-sdk-downloads.json').read_text())}
+          live = json.loads(Path('public/downloads.json').read_text())
+          reports, smokes = [], []
+          targets = {'windows-x64','linux-x64','linux-arm64','macos-arm64'}
+          assert {p.name.removeprefix('sdk-original-') for p in Path('candidates').iterdir()} == targets
+          for target in sorted(targets):
+              directory = Path('candidates') / ('sdk-original-' + target)
+              r = json.loads((directory / ('report-' + target + '.json')).read_text())
+              s = json.loads((directory / ('smoke-' + target + '.json')).read_text())
+              assert s['passed'] is True and s['target'] == r['target'] == target
+              assert r['original_archive_sha256'] == original[target]['sha256']
+              assert 'stage0' not in r['removed_categories']
+              archive = directory / r['archive']
+              assert archive.stat().st_size == r['archive_size']
+              with archive.open('rb') as stream:
+                  assert hashlib.file_digest(stream,'sha256').hexdigest() == r['archive_sha256']
+              entry = next(e for e in live if e['target'] == target and e['filename'].startswith('Rocket-SDK-'))
+              assert entry['filename'] == r['archive']
+              entry.update(size=r['archive_size'],sha256=r['archive_sha256'])
+              reports.append(r)
+              smokes.append(s)
+          ide = json.loads(Path('candidates/sdk-original-windows-x64/ide-verification.json').read_text())
+          assert ide['nativeDebuggerPassed'] and ide['installerPayloadIdentical']
+          assert ide['portableFiles'] == ide['consumerFiles'] == 834
+          out = Path('receipt'); out.mkdir()
+          receipt = dict(reason='Restore matching stage-zero runtime hosts removed by consumer SDK cleaning.',source_rebuilt=False,candidate_workflow='https://github.com/RyanEid06/Rocket-RocketIDE/actions/runs/' + json.load(open('run.json'))['id'].__str__(),reports=reports,smokes=smokes,ide=ide)
+          (out/'SDK-Runtime-Repair-2026-10-10.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          (out/'downloads.json').write_text(json.dumps(live,indent=2)+'\n')
+          (out/'SHA256SUMS.txt').write_text(''.join(f"{e['sha256']}  {e['filename']}\n" for e in live))
+          PY
+      - name: Publish all four verified archives and consistent release metadata
+        run: |
+          set -euo pipefail
+          gh release upload v3.0.0 -R "$GITHUB_REPOSITORY" candidates/sdk-original-*/Rocket-SDK-3.0.0-* --clobber
+          gh release upload v3.0.0 -R "$GITHUB_REPOSITORY" receipt/* --clobber
+          gh release view v3.0.0 -R "$GITHUB_REPOSITORY" --json assets > assets.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          assets = {a['name']:a for a in json.load(open('assets.json'))['assets']}
+          for entry in json.loads(Path('receipt/downloads.json').read_text()):
+              asset = assets[entry['filename']]
+              assert asset['size'] == entry['size'] and asset['digest'] == 'sha256:' + entry['sha256']
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: published-runtime-repair-receipt
+          path: receipt/*
+          retention-days: 30
