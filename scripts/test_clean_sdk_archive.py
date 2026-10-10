@@ -26,7 +26,7 @@ class CleanSdkArchiveTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)
             root = base / "rocket-3.0.0-linux-x64"
-            for relative in REQUIRED + ("stage0/rocketc-stage0", "docs/old.md"):
+            for relative in REQUIRED + ("stage0/rocketc-stage0", "stage0/rocketc-stage0.bin", "docs/old.md"):
                 path = root / relative
                 path.parent.mkdir(parents=True, exist_ok=True)
                 content = ("alias=linux-x64\n" if relative == "share/rocket/target.txt"
@@ -69,7 +69,8 @@ class CleanSdkArchiveTest(unittest.TestCase):
             self.assertIn("bin/rocketc", names)
             self.assertIn("INSTALL.md", names)
             self.assertIn("RELEASE.json", names)
-            self.assertNotIn("stage0/rocketc-stage0", names)
+            self.assertIn("stage0/rocketc-stage0", names)
+            self.assertIn("stage0/rocketc-stage0.bin", names)
             self.assertNotIn("docs/old.md", names)
             entry["sha256"] = "0" * 64
             manifest.write_text(json.dumps([entry]))

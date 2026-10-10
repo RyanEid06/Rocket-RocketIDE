@@ -15,7 +15,7 @@ from pathlib import Path, PurePosixPath
 
 VERSION = "3.0.0"
 TARGETS = ("linux-x64", "linux-arm64", "macos-arm64")
-KEEP_DIRS = {"bin", "lib", "include", "stdlib", "share", "licenses"}
+KEEP_DIRS = {"bin", "lib", "include", "stdlib", "share", "licenses", "stage0"}
 REQUIRED = (
     "bin/rocketc", "bin/rocketc.bin", "bin/rocket-lsp",
     "bin/rocket-lsp.bin", "bin/clang", "bin/llvm-ar", "bin/lld",
@@ -23,6 +23,7 @@ REQUIRED = (
     "lib/librocket_raylib_adapter.a",
     "include/rocket/raylib/rocket_raylib_adapter.h",
     "share/rocket/target.txt",
+    "stage0/rocketc-stage0", "stage0/rocketc-stage0.bin",
 )
 
 
@@ -63,8 +64,10 @@ def install_text(target: str) -> str:
     return f"""# Rocket SDK {VERSION} for {target}
 
 Extract this entire archive to a directory you can read and execute. Keep its
-`bin`, `lib`, `include`, `stdlib`, `share`, and `licenses` directories together.
+`bin`, `lib`, `include`, `stdlib`, `share`, `licenses`, and `stage0` directories together.
 This is the Rocket language SDK; RocketIDE is a separate Windows application.
+The matching `stage0` launcher and binary are required at runtime for debug
+builds, structured editor commands, and package security operations. Keep them.
 
 {prerequisite}
 From the extracted directory:
@@ -74,6 +77,7 @@ From the extracted directory:
 ./bin/rocketc target --verbose
 ./bin/rocketc check /path/to/hello.rocket
 ./bin/rocketc run /path/to/hello.rocket
+./bin/rocketc build /path/to/hello.rocket --debug --message-format=json
 ```
 
 Use `bin/rocket-lsp` for an editor's language-server command. The launchers

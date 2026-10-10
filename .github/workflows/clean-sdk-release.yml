@@ -61,27 +61,7 @@ jobs:
           mkdir -p "$work"
           tar -xJf "dist-sdk/Rocket-SDK-3.0.0-$TARGET.tar.xz" -C "$work"
           sdk="$work/Rocket-SDK-3.0.0-$TARGET"
-          SDK="$sdk" python - <<'PY'
-          import hashlib, os
-          from pathlib import Path
-          root = Path(os.environ['SDK'])
-          expected = set()
-          for line in (root / 'SHA256SUMS.txt').read_text().splitlines():
-              digest, relative = line.split('  ', 1)
-              path = root / relative
-              assert path.is_file(), relative
-              assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, relative
-              expected.add(relative)
-          actual = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
-          assert actual - {'SHA256SUMS.txt'} == expected
-          assert not ({'stage0', 'tools', 'docs', 'editors'} & {p.name for p in root.iterdir()})
-          print(f'Verified {len(actual)} package files and all SHA-256 checksums')
-          PY
-          printf 'fn main() -> Int:\n    print("rocket-sdk-smoke-ok")\n    return 0\n' > "$work/hello.rocket"
-          "$sdk/bin/rocketc" --version | grep -Fx 'rocketc 3.0.0'
-          "$sdk/bin/rocketc" target --verbose | grep -Fx "target: $TARGET"
-          "$sdk/bin/rocketc" check "$work/hello.rocket"
-          "$sdk/bin/rocketc" run "$work/hello.rocket" | grep -Fx 'rocket-sdk-smoke-ok'
+          python scripts/verify_sdk.py --sdk "$sdk" --target "$TARGET" --report "dist-sdk/smoke-$TARGET.json"
       - uses: actions/upload-artifact@v4
         with:
           name: clean-sdk-${{ matrix.target }}

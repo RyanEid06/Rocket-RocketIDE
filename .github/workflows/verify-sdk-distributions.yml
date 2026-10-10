@@ -1,0 +1,102 @@
+name: Verify complete SDK distributions
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Original tested inputs for candidates, or current published downloads
+        type: choice
+        options: [original, published]
+        default: original
+  workflow_call:
+    inputs:
+      source:
+        type: string
+        default: original
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {target: windows-x64, runner: windows-2025, extension: zip}
+          - {target: linux-x64, runner: ubuntu-24.04, extension: tar.xz}
+          - {target: linux-arm64, runner: ubuntu-24.04-arm, extension: tar.xz}
+          - {target: macos-arm64, runner: macos-14, extension: tar.xz}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET: ${{ matrix.target }}
+      EXTENSION: ${{ matrix.extension }}
+      SOURCE: ${{ inputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Packaging regressions
+        run: python -m unittest discover -s scripts -p "test_*.py" -v
+      - name: Linux host link prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libc6-dev libcurl4-openssl-dev
+      - name: Prepare candidate or retrieve published SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p original dist-sdk smoke
+          if [ "$SOURCE" = original ]; then
+            name="rocket-3.0.0-$TARGET.$EXTENSION"
+            gh release download v3.0.0 -R RyanEid06/Rocket-RocketIDE -p "$name" -D original
+            if [ "$TARGET" = windows-x64 ]; then
+              python scripts/clean_windows_sdk.py --input "original/$name" --manifest scripts/original-sdk-downloads.json --output-dir dist-sdk
+            else
+              python scripts/clean_sdk_archive.py --input "original/$name" --manifest scripts/original-sdk-downloads.json --target "$TARGET" --output-dir dist-sdk
+            fi
+          elif [ "$SOURCE" = published ]; then
+            name="Rocket-SDK-3.0.0-$TARGET.$EXTENSION"
+            gh release download v3.0.0 -R RyanEid06/Rocket-RocketIDE -p "$name" -D dist-sdk
+            python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          entry = next(e for e in json.loads(Path('public/downloads.json').read_text()) if e['target'] == os.environ['TARGET'] and e['filename'].startswith('Rocket-SDK-'))
+          archive = Path('dist-sdk') / entry['filename']
+          assert archive.stat().st_size == entry['size']
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == entry['sha256']
+          PY
+          else
+            exit 2
+          fi
+          python - <<'PY'
+          import os, shutil
+          shutil.unpack_archive('dist-sdk/Rocket-SDK-3.0.0-' + os.environ['TARGET'] + '.' + os.environ['EXTENSION'], 'smoke')
+          PY
+      - name: Isolated native SDK contract including IDE commands and debug build
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/verify_sdk.py --sdk "smoke/Rocket-SDK-3.0.0-$TARGET" --target "$TARGET" --report "dist-sdk/smoke-$TARGET.json"
+      - uses: actions/setup-dotnet@v4
+        if: runner.os == 'Windows'
+        with:
+          dotnet-version: '10.0.x'
+      - name: Verify frozen IDE, installer, consumer branch, and actual native debugger
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/verify_ide_distribution.ps1 -Sdk (Resolve-Path smoke/Rocket-SDK-3.0.0-windows-x64) -OutputRoot (Join-Path $env:RUNNER_TEMP 'IDE distribution verification')
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sdk-${{ inputs.source }}-${{ matrix.target }}
+          path: |
+            dist-sdk/Rocket-SDK-3.0.0-*
+            dist-sdk/report-*.json
+            dist-sdk/smoke-*.json
+            dist-sdk/ide-verification.json
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error

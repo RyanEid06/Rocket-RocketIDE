@@ -47,20 +47,7 @@ jobs:
           New-Item -ItemType Directory -Force $work | Out-Null
           Expand-Archive -LiteralPath dist-sdk/Rocket-SDK-3.0.0-windows-x64.zip -DestinationPath $work
           $sdk = Join-Path $work 'Rocket-SDK-3.0.0-windows-x64'
-          $env:SDK = $sdk
-          python -c "import hashlib,os,pathlib; r=pathlib.Path(os.environ['SDK']); entries=[line.split('  ',1) for line in (r/'SHA256SUMS.txt').read_text().splitlines()]; assert all(hashlib.sha256((r/p).read_bytes()).hexdigest()==d for d,p in entries); actual={p.relative_to(r).as_posix() for p in r.rglob('*') if p.is_file()}; assert actual-{'SHA256SUMS.txt'}=={p for d,p in entries}; assert not {'docs','editors','stage0','tools'} & {p.name for p in r.iterdir()}; print('Verified',len(actual),'package files')"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $hello = Join-Path $work 'hello.rocket'
-          [IO.File]::WriteAllText($hello, "fn main() -> Int:`n    print(`"rocket-sdk-smoke-ok`")`n    return 0`n")
-          & (Join-Path $sdk 'bin/rocketc.exe') --version
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & (Join-Path $sdk 'bin/rocket-lsp.exe') --version
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & (Join-Path $sdk 'bin/rocketc.exe') target --verbose
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & (Join-Path $sdk 'bin/rocketc.exe') check $hello
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & (Join-Path $sdk 'bin/rocketc.exe') run $hello
+          python scripts/verify_sdk.py --sdk $sdk --target windows-x64 --report dist-sdk/smoke-windows-x64.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify portable IDE and silent installer in disposable paths
         shell: pwsh
