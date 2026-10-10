@@ -68,7 +68,7 @@ export const PageDownloadLang: React.FC<PageDownloadLangProps> = ({ onNavigate }
             Rocket 3.0.0 compiler (<code className="text-orange-300 font-mono-code">rocketc</code>), standard libraries, and Language Server Protocol engine.
           </p>
           <p className="text-xs text-neutral-500 mt-2">
-            Built from Rocket master <a href="https://github.com/RyanEid06/Rocket/commit/1f6ba76f16f3246095d5d573c28d825d8b9367e3" target="_blank" rel="noreferrer" className="text-orange-300 hover:underline">1f6ba76</a>. <button onClick={() => onNavigate('roadmap')} className="text-orange-300 hover:underline">See the named roadmap</button>.
+            Built from Rocket master <a href="https://github.com/RyanEid06/Rocket/commit/1f6ba76f16f3246095d5d573c28d825d8b9367e3" target="_blank" rel="noreferrer" className="text-orange-300 hover:underline">1f6ba76</a>.
           </p>
         </div>
 
