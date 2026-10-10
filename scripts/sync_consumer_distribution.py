@@ -67,7 +67,8 @@ def sync_rocket(repo, manifest, archives):
         name = 'platforms/'+entry['filename']
         (archives/entry['filename']).replace(repo/name)
         new[name] = entry['sha256']
-    for name in ('.gitattributes', '.gitignore', 'README.md', 'ROADMAP.md'):
+    documents = sorted(name for name in tracked(repo) if '/' not in name and name.endswith('.md'))
+    for name in ('.gitattributes', '.gitignore', *documents):
         new[name] = sha(repo/name)
     assert (tracked(repo) - {'SHA256SUMS.txt'} | {'platforms/windows-x64/stage0/rocketc-stage0.exe'}) == set(new)
     write(repo/'SHA256SUMS.txt', ''.join(f'{new[n]}  {n}\n' for n in sorted(new)))

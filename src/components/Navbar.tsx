@@ -15,8 +15,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
     { id: 'intro', label: 'Overview' },
     { id: 'try', label: 'Try Rocket' },
     { id: 'download-ide', label: 'RocketIDE' },
-    { id: 'download-lang', label: 'Rocket Language' },
-    { id: 'roadmap', label: 'Roadmap' }
+    { id: 'download-lang', label: 'Rocket Language' }
   ];
 
   const handleNav = (page: AppPage) => {

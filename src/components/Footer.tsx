@@ -56,12 +56,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             >
               Language Toolchain
             </button>
-            <button
-              onClick={() => onNavigate('roadmap')}
-              className="hover:text-white transition-colors"
-            >
-              Roadmap
-            </button>
             <span className="text-neutral-700">|</span>
             <button
               onClick={() => setLegalModalOpen('license')}

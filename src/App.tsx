@@ -4,10 +4,9 @@ import { PageIntro } from './components/PageIntro';
 import { PagePlayground } from './components/PagePlayground';
 import { PageDownloadIde } from './components/PageDownloadIde';
 import { PageDownloadLang } from './components/PageDownloadLang';
-import { PageRoadmap } from './components/PageRoadmap';
 import { Footer } from './components/Footer';
 
-export type AppPage = 'intro' | 'try' | 'download-ide' | 'download-lang' | 'roadmap';
+export type AppPage = 'intro' | 'try' | 'download-ide' | 'download-lang';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<AppPage>('intro');
@@ -45,10 +44,6 @@ export default function App() {
 
         {currentPage === 'download-lang' && (
           <PageDownloadLang onNavigate={handleNavigate} />
-        )}
-
-        {currentPage === 'roadmap' && (
-          <PageRoadmap onNavigate={handleNavigate} />
         )}
       </main>
 
