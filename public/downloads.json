@@ -19,8 +19,8 @@
   },
   {
     "filename": "Rocket-SDK-3.0.0-windows-x64.zip",
-    "size": 309318104,
-    "sha256": "32198d4a79069527976bbe547add236ca37f1aec80620e2866a30d461b92fd2e",
+    "size": 328482532,
+    "sha256": "b4d72588af417a748e8d552543487ad411f26600838857be594c89a579bf50b0",
     "version": "3.0.0",
     "target": "windows-x64",
     "source_commit": "1f6ba76f16f3246095d5d573c28d825d8b9367e3",
@@ -28,8 +28,8 @@
   },
   {
     "filename": "Rocket-SDK-3.0.0-linux-x64.tar.xz",
-    "size": 569434080,
-    "sha256": "63b46e76da3bcb0e52ff8e57d374bbfcf186b4f5f5e8329072c63a296d6cab95",
+    "size": 587452344,
+    "sha256": "0417fb5fcd581ec2c6cd30f68b38ddb4d5f923de2a2fcfebcc127ed8e528f4a0",
     "version": "3.0.0",
     "target": "linux-x64",
     "source_commit": "1f6ba76f16f3246095d5d573c28d825d8b9367e3",
@@ -37,8 +37,8 @@
   },
   {
     "filename": "Rocket-SDK-3.0.0-linux-arm64.tar.xz",
-    "size": 526382240,
-    "sha256": "1abea809f8f81d019fce48ea3ddc81122b9e50166d3a3c4aceb653bb8432b573",
+    "size": 542345180,
+    "sha256": "5728aef2d87c755317e70a790a38dd01288a47ba4653c8ad7308fee17fe54878",
     "version": "3.0.0",
     "target": "linux-arm64",
     "source_commit": "1f6ba76f16f3246095d5d573c28d825d8b9367e3",
@@ -46,8 +46,8 @@
   },
   {
     "filename": "Rocket-SDK-3.0.0-macos-arm64.tar.xz",
-    "size": 285600756,
-    "sha256": "0efc667a008e973933fbbafb4c6e7cbfbeb85883bdbd0f4c90e186324672a3c8",
+    "size": 299003568,
+    "sha256": "b17cc0c46131c39ed513a872ef3fbf365a62a81ac86b6701c5c78e82112de7e8",
     "version": "3.0.0",
     "target": "macos-arm64",
     "source_commit": "1f6ba76f16f3246095d5d573c28d825d8b9367e3",

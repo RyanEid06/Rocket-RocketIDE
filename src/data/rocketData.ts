@@ -204,8 +204,8 @@ export const RELEASE_ASSETS: ReleaseAsset[] = [
     "filename": "Rocket-SDK-3.0.0-windows-x64.zip",
     "platform": "windows",
     "architecture": "windows-x64",
-    "size": "295.0 MiB",
-    "sha256": "32198d4a79069527976bbe547add236ca37f1aec80620e2866a30d461b92fd2e",
+    "size": "313.3 MiB",
+    "sha256": "b4d72588af417a748e8d552543487ad411f26600838857be594c89a579bf50b0",
     "type": "toolchain",
     "description": "Native compiler (rocketc), language server, standard library, and toolchain. Extract the complete SDK; follow INSTALL.md for setup.",
     "recommended": true
@@ -216,8 +216,8 @@ export const RELEASE_ASSETS: ReleaseAsset[] = [
     "filename": "Rocket-SDK-3.0.0-linux-x64.tar.xz",
     "platform": "linux",
     "architecture": "linux-x64",
-    "size": "543.1 MiB",
-    "sha256": "63b46e76da3bcb0e52ff8e57d374bbfcf186b4f5f5e8329072c63a296d6cab95",
+    "size": "560.2 MiB",
+    "sha256": "0417fb5fcd581ec2c6cd30f68b38ddb4d5f923de2a2fcfebcc127ed8e528f4a0",
     "type": "toolchain",
     "description": "Native compiler (rocketc), language server, standard library, and toolchain. Extract the complete SDK; follow INSTALL.md for setup.",
     "recommended": true
@@ -228,8 +228,8 @@ export const RELEASE_ASSETS: ReleaseAsset[] = [
     "filename": "Rocket-SDK-3.0.0-linux-arm64.tar.xz",
     "platform": "linux",
     "architecture": "linux-arm64",
-    "size": "502.0 MiB",
-    "sha256": "1abea809f8f81d019fce48ea3ddc81122b9e50166d3a3c4aceb653bb8432b573",
+    "size": "517.2 MiB",
+    "sha256": "5728aef2d87c755317e70a790a38dd01288a47ba4653c8ad7308fee17fe54878",
     "type": "toolchain",
     "description": "Native compiler (rocketc), language server, standard library, and toolchain. Extract the complete SDK; follow INSTALL.md for setup.",
     "recommended": true
@@ -240,8 +240,8 @@ export const RELEASE_ASSETS: ReleaseAsset[] = [
     "filename": "Rocket-SDK-3.0.0-macos-arm64.tar.xz",
     "platform": "macos",
     "architecture": "Apple Silicon ARM64",
-    "size": "272.4 MiB",
-    "sha256": "0efc667a008e973933fbbafb4c6e7cbfbeb85883bdbd0f4c90e186324672a3c8",
+    "size": "285.2 MiB",
+    "sha256": "b17cc0c46131c39ed513a872ef3fbf365a62a81ac86b6701c5c78e82112de7e8",
     "type": "toolchain",
     "description": "Native compiler (rocketc), language server, standard library, and toolchain. Extract the complete SDK; follow INSTALL.md for setup.",
     "recommended": true
